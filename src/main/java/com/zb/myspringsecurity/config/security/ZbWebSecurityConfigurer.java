@@ -2,6 +2,8 @@ package com.zb.myspringsecurity.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,6 +35,31 @@ public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .password("123")
                 .roles("ADMIN")
                 ;
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(
+                //"/**/*.html",
+                "/**/*.js",
+                "/**/*.css",
+                "/**/*.ico",
+                "/**/*.jpg",
+                "/**/*.png",
+                "/test/**" // 忽略test
+        );
+    }
+
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .and()
+                .httpBasic();
+
     }
     
 }
