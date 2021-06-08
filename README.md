@@ -3,3 +3,6 @@ v1.0：
 
 v2.0:
 - 在application.properties里面自定义用户和密码
+
+v3.0:
+- 在代码里面配置用户名和密码
