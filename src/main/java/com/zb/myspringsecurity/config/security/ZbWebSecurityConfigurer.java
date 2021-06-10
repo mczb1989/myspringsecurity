@@ -1,5 +1,6 @@
 package com.zb.myspringsecurity.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,12 +17,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    ZxUserDetailsServiceImpl zxUserDetailsService;
+    
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        /**
         auth.inMemoryAuthentication()
                 .withUser("zhangsan")
                 .password(passwordEncoder().encode("123"))
@@ -35,6 +40,8 @@ public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .password("123")
                 .roles("ADMIN")
                 ;
+         */
+        auth.userDetailsService(zxUserDetailsService);
     }
 
     @Override
