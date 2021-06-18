@@ -1,18 +1,15 @@
 package com.zb.myspringsecurity.config.security;
 
-import com.zb.myspringsecurity.entity.Role;
 import com.zb.myspringsecurity.entity.User;
 import com.zb.myspringsecurity.entity.UserRole;
 import com.zb.myspringsecurity.service.IUserRoleService;
 import com.zb.myspringsecurity.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -33,7 +30,7 @@ public class ZxUserDetailsServiceImpl implements UserDetailsService {
     IUserRoleService iUserRoleService;
     
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public ZxUser loadUserByUsername(String username) throws UsernameNotFoundException {
         /**
          // DEMO:
          
