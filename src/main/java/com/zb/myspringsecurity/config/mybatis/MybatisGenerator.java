@@ -87,7 +87,8 @@ public class MybatisGenerator {
         // strategy.setSuperControllerClass("com.baomidou.ant.common.BaseController");
         // 写于父类中的公共字段
         // strategy.setSuperEntityColumns("id");
-        strategy.setInclude("tb_user","tb_role","tr_user_role");
+//        strategy.setInclude("tb_user","tb_role","tr_user_role");
+        strategy.setInclude("tb_permission","tr_role_permission");
         //  strategy.setControllerMappingHyphenStyle(true);
         strategy.setTablePrefix("tb_", "tr_");
         mpg.setStrategy(strategy);

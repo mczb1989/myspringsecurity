@@ -1,7 +1,11 @@
 package com.zb.myspringsecurity.config.security;
 
+import com.zb.myspringsecurity.entity.Permission;
+import com.zb.myspringsecurity.entity.RolePermission;
 import com.zb.myspringsecurity.entity.User;
 import com.zb.myspringsecurity.entity.UserRole;
+import com.zb.myspringsecurity.service.IPermissionService;
+import com.zb.myspringsecurity.service.IRolePermissionService;
 import com.zb.myspringsecurity.service.IUserRoleService;
 import com.zb.myspringsecurity.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author zb
@@ -28,6 +32,10 @@ public class ZxUserDetailsServiceImpl implements UserDetailsService {
     IUserService iUserService;
     @Autowired
     IUserRoleService iUserRoleService;
+    @Autowired
+    IRolePermissionService iRolePermissionService;
+    @Autowired
+    private IPermissionService iPermissionService;
     
     @Override
     public ZxUser loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -55,11 +63,25 @@ public class ZxUserDetailsServiceImpl implements UserDetailsService {
         zxUser.setPassword(passwordEncoder.encode(user.getPassword()));
         zxUser.setId(user.getId());
         
-        List<UserRole> userRoleList = iUserRoleService.lambdaQuery().eq(UserRole::getUserId, zxUser.getId()).list();
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+
+        // role
+        List<UserRole> userRoleList = iUserRoleService.lambdaQuery().eq(UserRole::getUserId, zxUser.getId()).list();
         if (!CollectionUtils.isEmpty(userRoleList)) {
             for (UserRole userRole : userRoleList) {
                 authorityList.add(new SimpleGrantedAuthority(String.valueOf(userRole.getRoleId())));
+            }
+
+            // permission
+            List<Long> roleIdList = userRoleList.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+            List<RolePermission> rolePermissionList = iRolePermissionService.lambdaQuery()
+                    .in(RolePermission::getRoleId, roleIdList).list();
+            if (!CollectionUtils.isEmpty(rolePermissionList)) {
+                Collection<Permission> permissionList = iPermissionService
+                        .listByIds(rolePermissionList.stream()
+                                .map(RolePermission::getPermissionId).collect(Collectors.toList()));
+                Set<String> permissionSet = permissionList.stream().map(Permission::getEnName).collect(Collectors.toSet());
+                zxUser.setPermissionSet(permissionSet);
             }
         }
         zxUser.setAuthorities(authorityList);

@@ -1,10 +1,14 @@
 package com.zb.myspringsecurity.config.security;
 
+import com.zb.myspringsecurity.config.security.customer.ZbAccessDeniedHandler;
+import com.zb.myspringsecurity.config.security.customer.ZbAuthenticationEntryPoint;
+import com.zb.myspringsecurity.config.security.customer.ZbPermissionEvaluator;
 import com.zb.myspringsecurity.config.security.customer.ZbTokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,12 +16,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @author zb
  * @since 2021/6/8
  */
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
@@ -26,6 +32,14 @@ public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     
     @Autowired
     ZbTokenAuthenticationFilter zbTokenAuthenticationFilter;
+    
+    @Autowired
+    ZbPermissionEvaluator zbPermissionEvaluator;
+    
+    @Autowired
+    ZbAuthenticationEntryPoint zbAuthenticationEntryPoint;
+    @Autowired
+    ZbAccessDeniedHandler zbAccessDeniedHandler;
     
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -79,8 +93,14 @@ public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .and()
                 .httpBasic()
                 ;
+        httpSecurity.exceptionHandling()
+                .authenticationEntryPoint(zbAuthenticationEntryPoint)
+                .accessDeniedHandler(zbAccessDeniedHandler);
 
         httpSecurity.addFilterBefore(zbTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        httpSecurity.authorizeRequests().expressionHandler(defaultWebSecurityExpressionHandler());
+
     }
 
     /**
@@ -92,6 +112,13 @@ public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler() {
+        DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler = new DefaultWebSecurityExpressionHandler();
+        defaultWebSecurityExpressionHandler.setPermissionEvaluator(zbPermissionEvaluator);
+        return defaultWebSecurityExpressionHandler;
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author zb
@@ -15,6 +16,8 @@ import java.util.Collection;
 public class ZxUser extends User implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
+    
+    private Set<String> permissionSet;
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

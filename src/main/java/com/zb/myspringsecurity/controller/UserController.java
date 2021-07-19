@@ -5,6 +5,7 @@ import com.zb.myspringsecurity.entity.User;
 import com.zb.myspringsecurity.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +28,7 @@ public class UserController {
     @Autowired
     IUserService iUserService;
 
+    @PreAuthorize("hasPermission('UserController', 'system:user:read')")
     @RequestMapping("/list")
     public List<User> list(HttpServletRequest request) {
         log.info("session id: {}" , request.getSession().getId());
