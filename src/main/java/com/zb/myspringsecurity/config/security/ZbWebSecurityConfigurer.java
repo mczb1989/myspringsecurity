@@ -29,8 +29,8 @@ public class ZbWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .password(passwordEncoder().encode("123"))
                 .roles("ADMIN")
                 .and()
-                .withUser(passwordEncoder().encode("123"))
-                .password("123")
+                .withUser("wangwu")
+                .password(passwordEncoder().encode("123"))
                 .roles("ADMIN")
                 ;
     }
